@@ -1,0 +1,17 @@
+{
+  "risk_score": 1.0,
+  "regulatory_flags": [
+    "PMLA Section 12A"
+  ],
+  "compliance_reasoning": "Tier 1: I4C registry hit or composite score \u2265 0.85 triggered immediate block.",
+  "verdict_recommendation": "BLOCK",
+  "raw_verdict": {
+    "decision": "BLOCK",
+    "regulatory_basis": "PMLA Section 12A",
+    "thought_trace": "Tier 1: I4C registry hit or composite score \u2265 0.85 triggered immediate block.",
+    "escalated_to_human": false,
+    "rag_citations": [
+      "PMLA Section 12A"
+    ]
+  }
+}

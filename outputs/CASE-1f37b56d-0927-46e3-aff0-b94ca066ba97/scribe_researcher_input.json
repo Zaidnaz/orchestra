@@ -1,0 +1,37 @@
+{
+  "case_id": "CASE-1f37b56d-0927-46e3-aff0-b94ca066ba97",
+  "customer": {
+    "customer_id": "CUST001",
+    "name": "Rahul Sharma",
+    "country": "IN",
+    "kyc_status": "verified"
+  },
+  "transactions": [
+    {
+      "tx_id": "TXN555",
+      "amount": 9500.0,
+      "currency": "USD",
+      "timestamp": "2026-04-09T09:45:00+00:00",
+      "destination_country": "AE",
+      "transaction_type": "mobile_app"
+    }
+  ],
+  "login_events": [
+    {
+      "ip": "185.220.101.1",
+      "location": "AE",
+      "timestamp": "2026-04-09T18:54:48.420887+00:00"
+    }
+  ],
+  "device_data": {
+    "device_id": "DEV-44",
+    "device_risk_score": 0.86
+  },
+  "case_annotations": [
+    "Customer logged in from different countries within a short window, indicating impossible travel.",
+    "Current login IP is associated with VPN or proxy behavior.",
+    "Device has been linked to 4 accounts associated with prior mule-like behavior.",
+    "Alert was triggered by MULTI_LAYER_ANOMALY with risk score 1.0.",
+    "Reason codes: RC-003, RC-005, RC-011, SHARED_DEVICE_RISK, VPN_OR_PROXY_SIGNAL"
+  ]
+}

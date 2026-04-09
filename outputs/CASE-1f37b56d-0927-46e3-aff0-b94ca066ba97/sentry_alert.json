@@ -1,0 +1,48 @@
+{
+  "case_metadata": {
+    "case_id": "CASE-1f37b56d-0927-46e3-aff0-b94ca066ba97",
+    "alert_id": "ALT-4699cab2-c3ea-4c66-b849-357b53102582",
+    "customer_id": "CUST001",
+    "transaction_id": "TXN555",
+    "created_at": "2026-04-09T18:54:48.420887+00:00"
+  },
+  "trigger_source": "RULE_ENGINE_V1",
+  "alert_summary": {
+    "alert_type": "MULTI_LAYER_ANOMALY",
+    "risk_score": 1.0,
+    "model_name": "Sentry_Composite_V1",
+    "model_version": "1.0.0",
+    "anomaly_band": "CRITICAL",
+    "reason_codes": [
+      {
+        "code": "RC-003",
+        "description": "PMLA Rolling Threshold (> \u20b950L)"
+      },
+      {
+        "code": "RC-011",
+        "description": "Shared phone / email across accounts"
+      },
+      {
+        "code": "RC-005",
+        "description": "ML anomaly score above threshold (Moderate)"
+      }
+    ]
+  },
+  "trigger_context": {
+    "current_ip": "185.220.101.1",
+    "current_ip_country": "AE",
+    "device_id": "DEV-44",
+    "shared_email": "x@example.com",
+    "shared_phone": "+919999999999",
+    "channel": "mobile_app"
+  },
+  "flagged_transaction": {
+    "origin_account": "ACC2001",
+    "destination_account": "BEN9001",
+    "amount": 9500.0,
+    "currency": "USD",
+    "timestamp": "2026-04-09T09:45:00+00:00",
+    "destination_country": "AE"
+  },
+  "auto_blocked": true
+}

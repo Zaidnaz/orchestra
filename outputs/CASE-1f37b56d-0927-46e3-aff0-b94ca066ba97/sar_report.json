@@ -1,0 +1,65 @@
+{
+  "case_id": "CASE-1f37b56d-0927-46e3-aff0-b94ca066ba97",
+  "generated_at": "2026-04-09T18:56:34.880462+00:00",
+  "case_metadata": {
+    "risk_score": 1.0,
+    "verdict_recommendation": "BLOCK",
+    "regulatory_flags": [
+      "PMLA Section 12A"
+    ]
+  },
+  "customer_profile": {
+    "customer_id": "CUST001",
+    "name": "Rahul Sharma",
+    "country": "IN",
+    "kyc_status": "verified"
+  },
+  "investigation_summary": "Case Metadata",
+  "evidence_explanation": "Evidence signals are summarized from the investigator and compliance payloads.",
+  "regulatory_risk_analysis": "Regulatory flags and compliance reasoning indicate elevated AML risk.",
+  "final_compliance_recommendation": "Escalate for human compliance review and FIU-IND filing assessment.",
+  "evidence_collected": [
+    "Customer logged in from different countries within a short window, indicating impossible travel.",
+    "Current login IP is associated with VPN or proxy behavior.",
+    "Device has been linked to 4 accounts associated with prior mule-like behavior.",
+    "Alert was triggered by MULTI_LAYER_ANOMALY with risk score 1.0.",
+    "Reason codes: RC-003, RC-005, RC-011, SHARED_DEVICE_RISK, VPN_OR_PROXY_SIGNAL"
+  ],
+  "transaction_details": [
+    {
+      "tx_id": "TXN555",
+      "amount": 9500.0,
+      "currency": "USD",
+      "timestamp": "2026-04-09T09:45:00Z",
+      "destination_country": "AE",
+      "transaction_type": "mobile_app"
+    }
+  ],
+  "device_risk_signals": {
+    "device_id": "DEV-44",
+    "device_risk_score": 0.86
+  },
+  "login_activity": [
+    {
+      "ip": "185.220.101.1",
+      "location": "AE",
+      "timestamp": "2026-04-09T18:54:48.420887Z"
+    }
+  ],
+  "compliance_reasoning": "Tier 1: I4C registry hit or composite score \u2265 0.85 triggered immediate block.",
+  "risk_score_assessment": "Critical risk",
+  "verdict_recommendation": "BLOCK",
+  "timeline": [
+    {
+      "timestamp": "2026-04-09T09:45:00+00:00",
+      "event_type": "transaction",
+      "description": "Transfer initiated: TXN555 USD 9,500.00 to AE via mobile_app"
+    },
+    {
+      "timestamp": "2026-04-09T18:54:48.420887+00:00",
+      "event_type": "login",
+      "description": "Login from AE (IP: 185.220.101.1)"
+    }
+  ],
+  "risk_score": 1.0
+}

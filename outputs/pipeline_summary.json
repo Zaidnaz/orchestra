@@ -1,0 +1,12 @@
+[
+  {
+    "index": 1,
+    "case_id": "CASE-1f37b56d-0927-46e3-aff0-b94ca066ba97",
+    "status": "ok",
+    "risk_score": 1.0,
+    "verdict": "BLOCK",
+    "scribe_status": "ok",
+    "validation_status": "VALID",
+    "output_dir": "E:\\hackathon\\new_horizon\\orchestrator_agent\\outputs\\CASE-1f37b56d-0927-46e3-aff0-b94ca066ba97"
+  }
+]
