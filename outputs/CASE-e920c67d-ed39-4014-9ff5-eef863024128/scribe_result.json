@@ -1,0 +1,4 @@
+{
+  "status": "skipped",
+  "error": "Scribe import failed: No module named 'dotenv'"
+}
