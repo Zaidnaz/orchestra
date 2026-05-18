@@ -11,3 +11,4 @@ demo_frontend/out/
 demo_frontend/.vercel/
 demo_frontend/.runtime/
 demo_frontend/.vscode/
+demo_frontend/tsconfig.tsbuildinfo
