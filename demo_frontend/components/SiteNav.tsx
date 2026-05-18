@@ -17,6 +17,7 @@ export function SiteNav() {
     <header className="site-nav-wrap">
       <nav className="site-nav shell">
         <Link href="/" className="brand">
+          <span className="brand-dot" />
           New Horizon
         </Link>
         <div className="nav-links">

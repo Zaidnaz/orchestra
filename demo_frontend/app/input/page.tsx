@@ -9,7 +9,19 @@ const currencies = ["USD", "EUR", "GBP", "INR"];
 const channels = ["Card", "Wire", "Crypto Exchange", "Mobile Banking"];
 const countries = ["Local", "Singapore", "UAE", "Hong Kong", "Nigeria", "Turkey"];
 
-const demoProfiles = [
+interface DemoProfile {
+  customerName: string;
+  accountId: string;
+  amount: string;
+  currency: string;
+  destinationCountry: string;
+  channel: string;
+  narrative: string;
+  riskHint: string;
+  amountDisplay: string;
+}
+
+const demoProfiles: DemoProfile[] = [
   {
     customerName: "Aarav Mehta",
     accountId: "ACC-NH-204",
@@ -17,7 +29,9 @@ const demoProfiles = [
     currency: "USD",
     destinationCountry: "UAE",
     channel: "Mobile Banking",
-    narrative: "Urgent transfer to new beneficiary with shared contact and proxy behavior."
+    narrative: "Urgent transfer to new beneficiary with shared contact and proxy behavior.",
+    riskHint: "HIGH · Velocity + geo",
+    amountDisplay: "USD 9,20,000"
   },
   {
     customerName: "Nisha Kapoor",
@@ -26,7 +40,9 @@ const demoProfiles = [
     currency: "EUR",
     destinationCountry: "Hong Kong",
     channel: "Wire",
-    narrative: "High-value split settlement across offshore counterparties under time pressure."
+    narrative: "High-value split settlement across offshore counterparties under time pressure.",
+    riskHint: "HIGH · Structuring",
+    amountDisplay: "EUR 1,80,000"
   },
   {
     customerName: "Vikram Rao",
@@ -35,7 +51,9 @@ const demoProfiles = [
     currency: "USD",
     destinationCountry: "Singapore",
     channel: "Card",
-    narrative: "Repeated external merchant payments to newly added payee network."
+    narrative: "Repeated external merchant payments to newly added payee network.",
+    riskHint: "MEDIUM · Unusual payee",
+    amountDisplay: "USD 75,000"
   },
   {
     customerName: "Riya Sen",
@@ -44,11 +62,23 @@ const demoProfiles = [
     currency: "INR",
     destinationCountry: "Local",
     channel: "Card",
-    narrative: "Monthly software subscription and regular bill payment."
+    narrative: "Monthly software subscription and regular bill payment.",
+    riskHint: "LOW · Routine",
+    amountDisplay: "INR 1,200"
   }
 ];
 
-const randomItem = <T,>(items: T[]): T => items[Math.floor(Math.random() * items.length)];
+const riskColor = (hint: string) => {
+  if (hint.startsWith("HIGH")) return "var(--danger)";
+  if (hint.startsWith("MEDIUM")) return "var(--warning)";
+  return "var(--brand)";
+};
+
+const riskBg = (hint: string) => {
+  if (hint.startsWith("HIGH")) return "var(--danger-light)";
+  if (hint.startsWith("MEDIUM")) return "var(--warning-light)";
+  return "var(--brand-light)";
+};
 
 export default function InputPage() {
   const router = useRouter();
@@ -58,6 +88,7 @@ export default function InputPage() {
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [activeJobId, setActiveJobId] = useState<string>("");
   const [isRunning, setIsRunning] = useState(false);
+  const [selectedProfile, setSelectedProfile] = useState<number | null>(null);
 
   const [form, setForm] = useState({
     customerName: "",
@@ -70,9 +101,19 @@ export default function InputPage() {
     geminiApiKey: ""
   });
 
-  const fillRandomDemoInput = () => {
-    const profile = randomItem(demoProfiles);
-    setForm((prev) => ({ ...prev, ...profile }));
+  const applyProfile = (index: number) => {
+    const profile = demoProfiles[index];
+    setSelectedProfile(index);
+    setForm((prev) => ({
+      ...prev,
+      customerName: profile.customerName,
+      accountId: profile.accountId,
+      amount: profile.amount,
+      currency: profile.currency,
+      destinationCountry: profile.destinationCountry,
+      channel: profile.channel,
+      narrative: profile.narrative
+    }));
     setError("");
   };
 
@@ -82,7 +123,7 @@ export default function InputPage() {
 
     const amount = Number(form.amount);
     if (!form.customerName || !form.accountId || !form.narrative || Number.isNaN(amount) || amount <= 0) {
-      setError("Please fill all fields with a valid amount.");
+      setError("Please fill all required fields with a valid amount.");
       return;
     }
 
@@ -90,15 +131,13 @@ export default function InputPage() {
     setJobStatus("queued");
     setElapsedSeconds(0);
     setActiveJobId("");
-    setProgressLabel("Starting local backend job...");
+    setProgressLabel("Dispatching to orchestrator...");
     const startedAt = Date.now();
 
     try {
       const response = await fetch("/api/cases/run", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           customerName: form.customerName,
           accountId: form.accountId,
@@ -120,11 +159,19 @@ export default function InputPage() {
       setActiveJobId(jobId);
       const maxPolls = 180;
 
+      const progressMessages = [
+        "Sentry agent scoring anomalies...",
+        "Researcher agent enriching context...",
+        "Compliance agent evaluating regulatory signals...",
+        "Scribe agent generating report narrative...",
+        "Orchestrator validating evidence chain..."
+      ];
+
       let resolvedRecord: CaseRecord | null = null;
       for (let i = 0; i < maxPolls; i += 1) {
         setElapsedSeconds(Math.floor((Date.now() - startedAt) / 1000));
-        if (i % 5 === 0) {
-          setProgressLabel("Agents are running in background...");
+        if (i % 8 === 0) {
+          setProgressLabel(progressMessages[Math.floor(i / 8) % progressMessages.length]);
         }
 
         const jobResponse = await fetch(`/api/cases/jobs/${jobId}`, {
@@ -178,41 +225,91 @@ export default function InputPage() {
   return (
     <section className="panel input-wrap reveal-up">
       <div className="input-head">
-        <h1>Create Investigation Case</h1>
-        <button type="button" className="btn btn-ghost dice-btn" onClick={fillRandomDemoInput} disabled={isRunning}>
-          Dice Autofill Demo
-        </button>
+        <div>
+          <p className="eyebrow" style={{ marginBottom: "0.4rem" }}>New Investigation</p>
+          <h1>Create Case</h1>
+          <p className="section-copy" style={{ marginTop: 0 }}>
+            Transaction details drive all downstream agent analysis. Fill or select a demo profile below.
+          </p>
+        </div>
       </div>
-      <p className="section-copy">Input transaction details once to drive all downstream agent analysis pages.</p>
 
-      {jobStatus !== "idle" ? (
+      {/* Demo profile cards */}
+      <div>
+        <p style={{ fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--muted)", marginBottom: "0.5rem", marginTop: "0.25rem" }}>
+          Demo Profiles — click to autofill
+        </p>
+        <div className="demo-profiles">
+          {demoProfiles.map((profile, index) => (
+            <button
+              key={profile.customerName}
+              type="button"
+              className={`demo-profile-card${selectedProfile === index ? " selected" : ""}`}
+              onClick={() => applyProfile(index)}
+              disabled={isRunning}
+            >
+              <div className="demo-profile-name">{profile.customerName}</div>
+              <div className="demo-profile-detail">{profile.accountId} · {profile.channel}</div>
+              <div className="demo-profile-amount">{profile.amountDisplay}</div>
+              <div style={{
+                marginTop: "0.4rem",
+                fontSize: "0.7rem",
+                fontWeight: 800,
+                letterSpacing: "0.04em",
+                color: riskColor(profile.riskHint),
+                background: riskBg(profile.riskHint),
+                display: "inline-block",
+                padding: "0.15rem 0.45rem",
+                borderRadius: "999px"
+              }}>
+                {profile.riskHint}
+              </div>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Run status */}
+      {jobStatus !== "idle" && (
         <article className="run-status-card">
-          <p className="run-status-title">Backend Run Status</p>
+          <p className="run-status-title">Pipeline Status</p>
           <div className="run-status-grid">
             <p>
               State
-              <strong className={`run-status-chip ${jobStatus}`}>{jobStatus.toUpperCase()}</strong>
+              <strong>
+                <span className={`run-status-chip ${jobStatus}`}>{jobStatus.toUpperCase()}</span>
+              </strong>
             </p>
             <p>
               Elapsed
               <strong>{elapsedSeconds}s</strong>
             </p>
             <p>
-              Job
-              <strong>{activeJobId ? activeJobId.slice(0, 8) : "Pending"}</strong>
+              Job ID
+              <strong style={{ fontFamily: "var(--font-plex-mono), monospace", fontSize: "0.8rem" }}>
+                {activeJobId ? activeJobId.slice(0, 8) + "…" : "Pending"}
+              </strong>
             </p>
           </div>
-          {isRunning && progressLabel ? <p className="section-copy">{progressLabel}</p> : null}
+          {isRunning && progressLabel && (
+            <p style={{ margin: "0.6rem 0 0", fontSize: "0.82rem", color: "var(--brand-strong)", fontWeight: 600 }}>
+              ↳ {progressLabel}
+            </p>
+          )}
         </article>
-      ) : null}
+      )}
 
-      <form onSubmit={onSubmit} className="form-grid">
+      {/* Form */}
+      <form onSubmit={onSubmit} className="form-grid" style={{ marginTop: "1rem" }}>
+        <div className="form-section-label">Transaction Details</div>
+
         <label>
           Customer Name
           <input
             value={form.customerName}
-            onChange={(event) => setForm((prev) => ({ ...prev, customerName: event.target.value }))}
+            onChange={(e) => setForm((p) => ({ ...p, customerName: e.target.value }))}
             placeholder="Aarav Mehta"
+            disabled={isRunning}
           />
         </label>
 
@@ -220,8 +317,9 @@ export default function InputPage() {
           Account ID
           <input
             value={form.accountId}
-            onChange={(event) => setForm((prev) => ({ ...prev, accountId: event.target.value }))}
+            onChange={(e) => setForm((p) => ({ ...p, accountId: e.target.value }))}
             placeholder="ACC-900182"
+            disabled={isRunning}
           />
         </label>
 
@@ -232,8 +330,9 @@ export default function InputPage() {
             min="0"
             step="0.01"
             value={form.amount}
-            onChange={(event) => setForm((prev) => ({ ...prev, amount: event.target.value }))}
+            onChange={(e) => setForm((p) => ({ ...p, amount: e.target.value }))}
             placeholder="42000"
+            disabled={isRunning}
           />
         </label>
 
@@ -241,13 +340,10 @@ export default function InputPage() {
           Currency
           <select
             value={form.currency}
-            onChange={(event) => setForm((prev) => ({ ...prev, currency: event.target.value }))}
+            onChange={(e) => setForm((p) => ({ ...p, currency: e.target.value }))}
+            disabled={isRunning}
           >
-            {currencies.map((item) => (
-              <option key={item} value={item}>
-                {item}
-              </option>
-            ))}
+            {currencies.map((c) => <option key={c} value={c}>{c}</option>)}
           </select>
         </label>
 
@@ -255,13 +351,10 @@ export default function InputPage() {
           Destination Country
           <select
             value={form.destinationCountry}
-            onChange={(event) => setForm((prev) => ({ ...prev, destinationCountry: event.target.value }))}
+            onChange={(e) => setForm((p) => ({ ...p, destinationCountry: e.target.value }))}
+            disabled={isRunning}
           >
-            {countries.map((item) => (
-              <option key={item} value={item}>
-                {item}
-              </option>
-            ))}
+            {countries.map((c) => <option key={c} value={c}>{c}</option>)}
           </select>
         </label>
 
@@ -269,42 +362,50 @@ export default function InputPage() {
           Channel
           <select
             value={form.channel}
-            onChange={(event) => setForm((prev) => ({ ...prev, channel: event.target.value }))}
+            onChange={(e) => setForm((p) => ({ ...p, channel: e.target.value }))}
+            disabled={isRunning}
           >
-            {channels.map((item) => (
-              <option key={item} value={item}>
-                {item}
-              </option>
-            ))}
+            {channels.map((c) => <option key={c} value={c}>{c}</option>)}
           </select>
         </label>
 
         <label className="narrative-field">
-          Narrative
+          Transaction Narrative
           <textarea
-            rows={4}
+            rows={3}
             value={form.narrative}
-            onChange={(event) => setForm((prev) => ({ ...prev, narrative: event.target.value }))}
-            placeholder="Urgent transfer to new beneficiary for investment settlement."
+            onChange={(e) => setForm((p) => ({ ...p, narrative: e.target.value }))}
+            placeholder="Describe the transaction context — purpose, beneficiary relationship, urgency indicators..."
+            disabled={isRunning}
           />
         </label>
 
+        <div className="form-section-label">Optional Configuration</div>
+
         <label className="narrative-field">
-          Gemini API Key (Optional)
+          Gemini API Key <span style={{ fontWeight: 400, color: "var(--muted)" }}>(optional — enables cloud LLM for Scribe)</span>
           <input
             type="password"
             value={form.geminiApiKey}
-            onChange={(event) => setForm((prev) => ({ ...prev, geminiApiKey: event.target.value }))}
+            onChange={(e) => setForm((p) => ({ ...p, geminiApiKey: e.target.value }))}
             placeholder="Paste key to run Scribe with Gemini instead of Ollama"
             autoComplete="off"
+            disabled={isRunning}
           />
         </label>
 
-        {error ? <p className="error-text">{error}</p> : null}
+        {error && <p className="error-text">{error}</p>}
 
-        <button type="submit" className="btn btn-solid" disabled={isRunning}>
-          {isRunning ? "Running Agents In Background..." : "Run Real Agent Pipeline"}
-        </button>
+        <div style={{ gridColumn: "1 / -1", display: "flex", gap: "0.6rem", alignItems: "center", marginTop: "0.25rem" }}>
+          <button type="submit" className="btn btn-solid" disabled={isRunning} style={{ minWidth: "200px" }}>
+            {isRunning ? "Running Pipeline…" : "Run Agent Pipeline →"}
+          </button>
+          {!isRunning && (
+            <p style={{ margin: 0, fontSize: "0.78rem", color: "var(--muted)" }}>
+              Takes 30–180s depending on LLM provider
+            </p>
+          )}
+        </div>
       </form>
     </section>
   );
