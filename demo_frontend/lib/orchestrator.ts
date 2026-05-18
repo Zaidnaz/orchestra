@@ -424,7 +424,8 @@ export const loadOrchestratorCase = async (caseId: string): Promise<CaseRecord> 
   const researcherPath = path.join(caseDir, "researcher_output.json");
   const compliancePath = path.join(caseDir, "compliance_output.json");
   const scribePath = path.join(caseDir, "scribe_result.json");
-  const sarPath = path.join(caseDir, "sar_report.json");
+  const sarJsonPath = path.join(caseDir, "sar_report.json");
+  const sarMdPath = path.join(caseDir, "sar_report.md");
 
   const [sentryAlert, researcherOutput, complianceOutput, scribeResult] = await Promise.all([
     readJson<any>(sentryPath),
@@ -435,18 +436,27 @@ export const loadOrchestratorCase = async (caseId: string): Promise<CaseRecord> 
 
   let sarReport: any | undefined;
   try {
-    sarReport = await readJson<any>(sarPath);
+    sarReport = await readJson<any>(sarJsonPath);
   } catch {
     sarReport = undefined;
   }
 
-  return buildCaseRecordFromBundle({
+  let sarMarkdown: string | undefined;
+  try {
+    sarMarkdown = await fs.readFile(sarMdPath, "utf-8");
+  } catch {
+    sarMarkdown = undefined;
+  }
+
+  const record = buildCaseRecordFromBundle({
     sentry_alert: sentryAlert,
     researcher_output: researcherOutput,
     compliance_output: complianceOutput,
     scribe_result: scribeResult,
     sar_report: sarReport
   });
+
+  return { ...record, sarReport: sarMarkdown };
 };
 
 export const runOrchestratorForInput = async (

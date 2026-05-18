@@ -16,20 +16,26 @@ const spaceGrotesk = Space_Grotesk({
 const plexMono = IBM_Plex_Mono({
   variable: "--font-plex-mono",
   subsets: ["latin"],
-  weight: ["400", "500"]
+  weight: ["400", "500", "700"]
 });
 
 export const metadata: Metadata = {
-  title: "New Horizon Investigation Console",
-  description: "Multi-agent financial investigation workflow dashboard"
+  title: "New Horizon — Financial Crime Investigation Console",
+  description: "Autonomous multi-agent AML investigation platform — from transaction signal to regulator-ready SAR in under 3 minutes."
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        {/* Prevent flash of wrong theme on load */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `try{const t=localStorage.getItem('nh-theme');if(t==='dark')document.documentElement.setAttribute('data-theme','dark');}catch(e){}`
+          }}
+        />
+      </head>
       <body className={`${jakarta.variable} ${spaceGrotesk.variable} ${plexMono.variable}`}>
-        <div className="bg-aura bg-aura-left" aria-hidden="true" />
-        <div className="bg-aura bg-aura-right" aria-hidden="true" />
         <SiteNav />
         <main className="shell app-shell">{children}</main>
       </body>

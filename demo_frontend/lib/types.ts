@@ -23,4 +23,5 @@ export interface CaseRecord {
   transaction: TransactionInput;
   analyses: Record<AgentKey, AgentAnalysis>;
   finalVerdict: "ALLOW" | "REVIEW" | "BLOCK";
+  sarReport?: string;
 }
